@@ -63,11 +63,13 @@ public:
     
     set<DTUsuario> listarPropietarios() override;
     
-    void representarPropietario(string nicknamePropietario) override;
+    void representarPropietario(string nicknamePropietario, string nickname) override;
     
-    void altaCasa(string direccion, int numeroPuerta, int superficie, int anoConstruccion, bool esPH, TipoTecho techo) override;
+    void altaCasa(string direccion, int numeroPuerta, int superficie, int anoConstruccion, bool esPH, TipoTecho techo, string nickname) override;
     
-    void altaApartamento(string direccion, int numeroPuerta, int superficie, int anoConstruccion, int piso,bool tieneAscensor, float gastosComunes) override;
+    void altaApartamento(string direccion, int numeroPuerta, int superficie, int anoConstruccion, int piso,bool tieneAscensor, float gastosComunes, string propietario) override;
+    
+    set<DTInmuebleListado> listarInmuebles() override;
 
     
     void finalizarAltaUsuario() override;

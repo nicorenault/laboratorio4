@@ -35,18 +35,20 @@ public:
     
     virtual bool altaPublicacion(string nicknameInmobiliaria, int codigoInmueble, TipoPublicacion tipo, string texto, float precio) = 0;
 
-    // Nuevas del Lab 4
     virtual set<DTInmuebleListado> listarInmueblesNoAdministradosInmobiliaria(string nickname) = 0;
+    
     virtual void altaAdministraPropiedad(string nickname, int codigo) = 0;
     
     virtual set<DTUsuario> listarPropietarios() = 0;
     
-    virtual void representarPropietario(string nicknamePropietario) = 0;
+    virtual void representarPropietario(string nicknamePropietario, string nickname) = 0;
     
     virtual void finalizarAltaUsuario() = 0;
     
-    virtual void altaCasa(string direccion, int numeroPuerta, int superficie, int anoConstruccion, bool esPH, TipoTecho techo) = 0;
-    virtual void altaApartamento(string direccion, int numeroPuerta, int superficie, int anoConstruccion, int piso,bool tieneAscensor, float gastosComunes) = 0;
+    virtual void altaCasa(string direccion, int numeroPuerta, int superficie, int anoConstruccion, bool esPH, TipoTecho techo, string nickname) = 0;
+    virtual void altaApartamento(string direccion, int numeroPuerta, int superficie, int anoConstruccion, int piso,bool tieneAscensor, float gastosComunes, string propietario) = 0;
+    
+    virtual set<DTInmuebleListado> listarInmuebles() = 0;
 
     virtual ~IControladorSistema() {}
 };

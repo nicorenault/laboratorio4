@@ -16,7 +16,7 @@ ControladorSistema* ControladorSistema::getInstance() {
 }
 
 bool ControladorSistema::altaCliente(string nickname, string contrasena, string nombre, string email, string apellido, string documento) {
-    if (usuarios.count(nickname)) {
+    if (usuarios.count(nickname) || contrasena.length() < 6) {
         return false;
     }
     Cliente* nuevo = new Cliente(nickname, contrasena, nombre, email, apellido, documento);
@@ -25,7 +25,7 @@ bool ControladorSistema::altaCliente(string nickname, string contrasena, string 
 }
 
 bool ControladorSistema::altaPropietario(string nickname, string contrasena, string nombre, string email, string cuentaBancaria, string telefono) {
-    if (usuarios.count(nickname)) return false;
+    if (usuarios.count(nickname)|| contrasena.length() < 6) return false;
 
     Propietario* nuevo = new Propietario(nickname, contrasena, nombre, email, cuentaBancaria, telefono);
     propietarios[nickname] = nuevo;
@@ -34,7 +34,7 @@ bool ControladorSistema::altaPropietario(string nickname, string contrasena, str
 }
 
 bool ControladorSistema::altaInmobiliaria(string nickname, string contrasena, string nombre, string email, string direccion, string url, string telefono) {
-    if (usuarios.count(nickname)) return false;
+    if (usuarios.count(nickname)|| contrasena.length() < 6) return false;
 
     Inmobiliaria* nueva = new Inmobiliaria(nickname, contrasena, nombre, email, direccion, url, telefono);
     inmobiliarias[nickname] = nueva;
@@ -53,22 +53,24 @@ set<DTUsuario> ControladorSistema::listarInmobiliarias() {
 
     return resultado;
     
-    return {};
 }
 
-set<DTInmuebleListado> ControladorSistema::listarInmueblesAdministrados(string nicknameInmobiliaria) {
-    return {};
-}
 
-set<DTPublicacion> ControladorSistema::listarPublicacion(TipoPublicacion tipo, float precioMin, float precioMax, TipoInmueble tipoInmueble) {
-    return {};
-}
+set<DTInmuebleListado> ControladorSistema::listarInmuebles(){
+    set<DTInmuebleListado> resultado;
 
-void ControladorSistema::eliminarInmueble(int codigoInmueble) {}
+    map<int, Inmueble*>::iterator it;
+    for (it = inmuebles.begin(); it != inmuebles.end(); ++it) {
+        Inmueble* in = it->second;
 
-bool ControladorSistema::altaPublicacion(string nicknameInmobiliaria, int codigoInmueble, TipoPublicacion tipo, string texto, float precio) {
-    
-    return true;
+        int codigo = in->getCodigo();
+        string direccion = in->getDireccion();
+        string nicknamePropietario = in->getPropietario()->getNickname();
+        DTInmuebleListado dato = DTInmuebleListado(codigo, direccion, nicknamePropietario);
+        resultado.insert(dato);
+    }
+
+    return resultado;
 }
 
 set<DTInmuebleListado> ControladorSistema::listarInmueblesNoAdministradosInmobiliaria(string nickname) {
@@ -90,23 +92,58 @@ set<DTUsuario> ControladorSistema::listarPropietarios() {
     return resultado;
 }
 
-void ControladorSistema::representarPropietario(string nicknamePropietario) {
-    if (inmobiliariaSeleccionada && propietarios.count(nicknamePropietario)) {
-        Propietario* p = propietarios[nicknamePropietario];
-        inmobiliariaSeleccionada->agregarRepresentado(p);
+void ControladorSistema::representarPropietario(string nicknamePropietario, string nickname) {
+    if (inmobiliarias.count(nickname) && propietarios.count(nicknamePropietario)) {
+            Inmobiliaria* i = inmobiliarias[nickname];
+            Propietario* p = propietarios[nicknamePropietario];
+            i->agregarRepresentado(p);
     }
 }
 
-void ControladorSistema::finalizarAltaUsuario() {
-    inmobiliariaSeleccionada = nullptr;
-}
 
-void ControladorSistema::altaCasa(string direccion, int numeroPuerta, int superficie, int anoConstruccion, bool esPH, TipoTecho techo) {
+
+void ControladorSistema::altaCasa(string direccion, int numeroPuerta, int superficie, int anoConstruccion, bool esPH, TipoTecho techo, string propietario) {
     Inmueble* nuevo = new class Casa(direccion, numeroPuerta, superficie, anoConstruccion, esPH, techo);
     inmuebles[nuevo->getCodigo()] = nuevo;
+    nuevo->setPropietario(propietarios[propietario]);
 }
 
-void ControladorSistema::altaApartamento(string direccion, int numeroPuerta, int superficie, int anoConstruccion, int piso, bool tieneAscensor, float gastosComunes) {
+void ControladorSistema::altaApartamento(string direccion, int numeroPuerta, int superficie, int anoConstruccion, int piso, bool tieneAscensor, float gastosComunes, string propietario) {
     Inmueble* nuevo = new class Apartamento(direccion, numeroPuerta, superficie, anoConstruccion, piso, tieneAscensor, gastosComunes);
     inmuebles[nuevo->getCodigo()] = nuevo;
+    nuevo->setPropietario(propietarios[propietario]);
+    
 }
+
+
+//FAlTA IMPLEMENTAR
+
+void ControladorSistema::finalizarAltaUsuario() {}
+
+
+set<DTInmuebleListado> ControladorSistema::listarInmueblesAdministrados(string nicknameInmobiliaria) {
+    return {};
+}
+
+
+bool ControladorSistema::altaPublicacion(string nicknameInmobiliaria, int codigoInmueble, TipoPublicacion tipo, string texto, float precio) {return true;}
+
+
+set<DTPublicacion> ControladorSistema::listarPublicacion(TipoPublicacion tipo, float precioMin, float precioMax, TipoInmueble tipoInmueble) {
+    return {};
+}
+
+//DTInmueble detalleInmueblePublicacion(codigoPublicacion): DTInmueble
+
+// DTInmueble detalleInmueble(codigoInmueble)
+
+void ControladorSistema::eliminarInmueble(int codigoInmueble) {}
+
+//Coleccion de DTInmuebleListado listarInmueblesNoAdministradosInmobiliaria(nicknameInmobiliaria);
+
+//altaAdministraPropiedad(nicknameInmobiliaria, codigoInmueble);
+
+//funciones para notificaciones
+
+
+

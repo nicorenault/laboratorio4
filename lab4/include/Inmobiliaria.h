@@ -12,6 +12,7 @@ class Inmobiliaria : public Usuario {
         std::string url;
         std::string telefono;
         std::set<Propietario*> representados;
+    
 
     public:
         Inmobiliaria(std::string nickname, std::string contrasena, std::string nombre, std::string email, std::string direccion, std::string url, std::string telefono);

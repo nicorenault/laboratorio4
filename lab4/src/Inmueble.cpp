@@ -5,7 +5,12 @@ int Inmueble::ultimoCodigo = 1;
 
 Inmueble::Inmueble(std::string direccion, int numeroPuerta, int superficie, int anoConstruccion): direccion(direccion), numeroPuerta(numeroPuerta), superficie(superficie), anoConstruccion(anoConstruccion){
     codigo = ultimoCodigo++;
+    propietario = nullptr;
 };
+
+void Inmueble::setPropietario(Propietario* p) {
+    propietario = p;
+}
 
 Inmueble::~Inmueble() {}
 
@@ -27,4 +32,8 @@ int Inmueble::getSuperficie() const {
 
 int Inmueble::getAnioConstruccion() const {
     return anoConstruccion;
+}
+
+Propietario* Inmueble::getPropietario() {
+    return propietario;
 }
