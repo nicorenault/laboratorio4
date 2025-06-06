@@ -115,6 +115,26 @@ void ControladorSistema::altaApartamento(string direccion, int numeroPuerta, int
     
 }
 
+bool ControladorSistema::altaPublicacion(string nicknameInmobiliaria, int codigoInmueble, TipoPublicacion tipo, string texto, float precio) {
+    // Buscar la inmobiliaria por nickname
+    auto it = inmobiliarias.find(nicknameInmobiliaria);
+    if (it == inmobiliarias.end()) {
+        std::cerr << "Error: Inmobiliaria no encontrada." << std::endl;
+        return false;
+    }
+    Inmobiliaria* inmobiliaria = it->second;
+    // Buscar el inmueble que administra con ese código
+    Inmueble* inmueble = inmobiliaria->getInmueble(codigoInmueble);
+    if (inmueble == nullptr) {
+        std::cerr << "Error: Inmueble no encontrado para esa inmobiliaria." << std::endl;
+        return false;
+    }
+
+    Publicacion* publicacion = new Publicacion(tipo, texto, precio);
+    inmueble->setPublicacion(publicacion);
+
+    return true;
+}
 
 //FAlTA IMPLEMENTAR
 
@@ -124,9 +144,6 @@ void ControladorSistema::finalizarAltaUsuario() {}
 set<DTInmuebleListado> ControladorSistema::listarInmueblesAdministrados(string nicknameInmobiliaria) {
     return {};
 }
-
-
-bool ControladorSistema::altaPublicacion(string nicknameInmobiliaria, int codigoInmueble, TipoPublicacion tipo, string texto, float precio) {return true;}
 
 
 set<DTPublicacion> ControladorSistema::listarPublicacion(TipoPublicacion tipo, float precioMin, float precioMax, TipoInmueble tipoInmueble) {
