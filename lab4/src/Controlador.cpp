@@ -116,6 +116,7 @@ void ControladorSistema::altaApartamento(string direccion, int numeroPuerta, int
 }
 
 
+
 bool ControladorSistema::altaPublicacion(string nicknameInmobiliaria, int codigoInmueble, TipoPublicacion tipo, string texto, float precio) {
     // Buscar la inmobiliaria por nickname
     auto it = inmobiliarias.find(nicknameInmobiliaria);

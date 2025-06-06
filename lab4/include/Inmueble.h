@@ -16,6 +16,7 @@ class Inmueble {
     public:
         Inmueble(std::string direccion, int numeroPuerta, int superficie, int anoConstruccion);
         void setPropietario(Propietario* p);
+        void setPublicacion(Publicacion*);
         Propietario* getPropietario();
         ~Inmueble();
         int getCodigo() const;
