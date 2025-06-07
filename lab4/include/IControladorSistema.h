@@ -13,7 +13,8 @@
 #include "TipoTecho.h"
 #include "Casa.h"
 #include "Apartamento.h"
-
+#include "DTInmuebleAdministrado.h"
+#include "DTInmueble.h"
 
 using namespace std;
 
@@ -27,7 +28,7 @@ public:
     
     virtual set<DTUsuario> listarInmobiliarias() = 0;
     
-    virtual set<DTInmuebleListado> listarInmueblesAdministrados(string nicknameInmobiliaria) = 0;
+    virtual set<DTInmuebleAdministrado> listarInmueblesAdministrados(string nicknameInmobiliaria) = 0;
     
     virtual set<DTPublicacion> listarPublicacion(TipoPublicacion tipo, float precioMin, float precioMax, TipoInmueble tipoInmueble) = 0;
     
@@ -51,6 +52,8 @@ public:
     virtual set<DTInmuebleListado> listarInmuebles() = 0;
 
     virtual ~IControladorSistema() {}
+    virtual DTInmueble* detalleInmueble(int codigoInmueble) = 0;
+    virtual DTInmueble* detalleInmueblePublicacion(int codigoPublicacion) = 0;
 };
 
 #endif

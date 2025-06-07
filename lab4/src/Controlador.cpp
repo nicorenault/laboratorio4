@@ -3,7 +3,12 @@
 #include "Casa.h"
 #include "TipoTecho.h"
 #include "Apartamento.h"
+#include "Apartamento.h"
+#include "DTCasa.h"
+#include "DTApartamento.h"
 
+
+int ControladorSistema::ultimaPublicacion = 0;
 
 ControladorSistema* ControladorSistema::instancia = nullptr;
 
@@ -73,11 +78,25 @@ set<DTInmuebleListado> ControladorSistema::listarInmuebles(){
     return resultado;
 }
 
-set<DTInmuebleListado> ControladorSistema::listarInmueblesNoAdministradosInmobiliaria(string nickname) {
-    return {};
-}
 
-void ControladorSistema::altaAdministraPropiedad(string nickname, int codigo) {}
+
+void ControladorSistema::altaAdministraPropiedad(string nickname, int codigo) {
+    Inmobiliaria* inmobiliaria = inmobiliarias[nickname];
+    Inmueble* inmueble = inmuebles[codigo];
+
+    time_t now = time(0);
+    tm* ltm = localtime(&now);
+    DTFecha* fecha = new DTFecha(ltm->tm_mday, 1 + ltm->tm_mon, 1900 + ltm->tm_year);
+
+    AdministraPropiedad* ap = new AdministraPropiedad(fecha);
+    ap->setInmueble(inmueble);
+    ap->setInmobiliaria(inmobiliaria);
+
+    inmobiliaria->agregarAdministracion(ap);
+    inmueble->setAdministraPropiedad(ap);
+
+    
+}
 
 set<DTUsuario> ControladorSistema::listarPropietarios() {
     set<DTUsuario> resultado;
@@ -104,6 +123,7 @@ void ControladorSistema::representarPropietario(string nicknamePropietario, stri
 
 void ControladorSistema::altaCasa(string direccion, int numeroPuerta, int superficie, int anoConstruccion, bool esPH, TipoTecho techo, string propietario) {
     Inmueble* nuevo = new class Casa(direccion, numeroPuerta, superficie, anoConstruccion, esPH, techo);
+    nuevo->setPropietario(propietarios[propietario]);
     inmuebles[nuevo->getCodigo()] = nuevo;
     nuevo->setPropietario(propietarios[propietario]);
 }
@@ -112,12 +132,36 @@ void ControladorSistema::altaApartamento(string direccion, int numeroPuerta, int
     Inmueble* nuevo = new class Apartamento(direccion, numeroPuerta, superficie, anoConstruccion, piso, tieneAscensor, gastosComunes);
     inmuebles[nuevo->getCodigo()] = nuevo;
     nuevo->setPropietario(propietarios[propietario]);
+    nuevo->setPropietario(propietarios[propietario]);
     
 }
 
 
 
 bool ControladorSistema::altaPublicacion(string nicknameInmobiliaria, int codigoInmueble, TipoPublicacion tipo, string texto, float precio) {
+    
+    Inmobiliaria* i = inmobiliarias[nicknameInmobiliaria];
+    Inmueble* in = inmuebles[codigoInmueble];
+    AdministraPropiedad* ap = i->getAdministracionCon(in);
+    
+    
+    time_t now = time(0);
+    tm* ltm = localtime(&now);
+    DTFecha* fecha = new DTFecha(ltm->tm_mday, 1 + ltm->tm_mon, 1900 + ltm->tm_year);
+    int codigo = ++ultimaPublicacion;
+
+        Publicacion* nueva = new Publicacion(codigo, fecha, tipo, texto, precio, true);
+        ap->agregarPublicacion(nueva);
+
+        // Desactivar anterior publicación del mismo tipo, si la hay
+        Publicacion* vieja = ap->getPublicacionActivaDelTipo(tipo);
+        if (vieja != nullptr)
+            vieja->setActiva(false);
+
+        return true;
+
+    
+    /*
     // Buscar la inmobiliaria por nickname
     auto it = inmobiliarias.find(nicknameInmobiliaria);
     if (it == inmobiliarias.end()) {
@@ -149,31 +193,81 @@ bool ControladorSistema::altaPublicacion(string nicknameInmobiliaria, int codigo
 
     Publicacion* publicacion = new Publicacion(codigo, fecha, tipo, texto, precio, true);
     inmueble->setPublicacion(publicacion);
-
-    return true;
+*/
+   // return true;
 }
+
+set<DTInmuebleAdministrado> ControladorSistema::listarInmueblesAdministrados(string nicknameInmobiliaria) {
+        set<DTInmuebleAdministrado> resultado;
+        
+        Inmobiliaria* i = inmobiliarias[nicknameInmobiliaria];
+        set<AdministraPropiedad*> admins = i->getAdministraciones();
+
+        for (AdministraPropiedad* ap : admins) {
+            Inmueble* in = ap->getInmueble();
+            DTFecha* fecha = ap->getFecha();
+
+            DTInmuebleAdministrado dto(
+                in->getCodigo(),
+                in->getDireccion(),
+                fecha
+            );
+
+            resultado.insert(dto);
+        }
+
+        return resultado;
+    }
+    
+
+set<DTInmuebleListado> ControladorSistema::listarInmueblesNoAdministradosInmobiliaria(string nickname) {
+    set<DTInmuebleListado> resultado;
+
+    Inmobiliaria* inmobiliaria = inmobiliarias[nickname];
+    set<AdministraPropiedad*> administradas = inmobiliaria->getAdministraciones();
+
+    set<int> codigosAdministrados;
+    for (set<AdministraPropiedad*>::iterator it = administradas.begin(); it != administradas.end(); ++it) {
+        codigosAdministrados.insert((*it)->getInmueble()->getCodigo());
+    }
+
+    for (map<int, Inmueble*>::iterator it = inmuebles.begin(); it != inmuebles.end(); ++it) {
+        int codigo = it->first;
+        if (codigosAdministrados.find(codigo) == codigosAdministrados.end()) {
+            Inmueble* in = it->second;
+            Propietario* p = in->getPropietario();
+            DTInmuebleListado dt(codigo, in->getDireccion(), p->getNombre());
+            resultado.insert(dt);
+        }
+    }
+
+    return resultado;
+}
+
+
 //FAlTA IMPLEMENTAR
 
 void ControladorSistema::finalizarAltaUsuario() {}
 
 
-set<DTInmuebleListado> ControladorSistema::listarInmueblesAdministrados(string nicknameInmobiliaria) {
-    return {};
-}
-
 set<DTPublicacion> ControladorSistema::listarPublicacion(TipoPublicacion tipo, float precioMin, float precioMax, TipoInmueble tipoInmueble) {
     return {};
 }
 
-//DTInmueble detalleInmueblePublicacion(codigoPublicacion): DTInmueble
+DTInmueble* ControladorSistema::detalleInmueble(int codigoInmueble){
+    return{};
+}
 
-// DTInmueble detalleInmueble(codigoInmueble)
+
+//DTInmueble detalleInmueblePublicacion(codigoPublicacion): DTInmueble
+DTInmueble* ControladorSistema::detalleInmueblePublicacion(int codigoPublicacion){
+    return nullptr;
+}
+
 
 void ControladorSistema::eliminarInmueble(int codigoInmueble) {}
 
-//Coleccion de DTInmuebleListado listarInmueblesNoAdministradosInmobiliaria(nicknameInmobiliaria);
 
-//altaAdministraPropiedad(nicknameInmobiliaria, codigoInmueble);
 
 //funciones para notificaciones
 

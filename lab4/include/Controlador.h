@@ -21,12 +21,14 @@
 #include "Casa.h"
 #include "TipoTecho.h"
 #include "Apartamento.h"
-
+#include "DTInmuebleAdministrado.h"
+#include "DTCasa.h"
+#include "DTApartamento.h"
 
 class ControladorSistema : public IControladorSistema {
 private:
     static ControladorSistema* instancia;
-
+    static int ultimaPublicacion;
     map<string, Usuario*> usuarios;
     map<int, Inmueble*> inmuebles;
     set<AdministraPropiedad*> administraciones;
@@ -50,7 +52,7 @@ public:
 
     set<DTUsuario> listarInmobiliarias() override;
     
-    set<DTInmuebleListado> listarInmueblesAdministrados(string nicknameInmobiliaria) override;
+    set<DTInmuebleAdministrado> listarInmueblesAdministrados(string nicknameInmobiliaria) override;
     
     set<DTPublicacion> listarPublicacion(TipoPublicacion tipo, float precioMin, float precioMax, TipoInmueble tipoInmueble) override;
     
@@ -59,6 +61,7 @@ public:
     bool altaPublicacion(string nicknameInmobiliaria, int codigoInmueble, TipoPublicacion tipo, string texto, float precio) override;
 
     set<DTInmuebleListado> listarInmueblesNoAdministradosInmobiliaria(string nickname) override;
+    
     void altaAdministraPropiedad(string nickname, int codigo) override;
     
     set<DTUsuario> listarPropietarios() override;
@@ -71,6 +74,9 @@ public:
     
     set<DTInmuebleListado> listarInmuebles() override;
 
+    DTInmueble* detalleInmueble(int codigoInmueble) override;
+    
+    DTInmueble* detalleInmueblePublicacion(int codigoPublicacion) override;
     
     void finalizarAltaUsuario() override;
     

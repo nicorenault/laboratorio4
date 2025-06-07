@@ -37,3 +37,13 @@ int Inmueble::getAnioConstruccion() const {
 Propietario* Inmueble::getPropietario() {
     return propietario;
 }
+
+void Inmueble::setAdministraPropiedad(AdministraPropiedad* ap) {
+    adminPropiedad = ap;
+}
+
+AdministraPropiedad* Inmueble::getAdministraPropiedad() const {
+    return adminPropiedad;
+}
+
+

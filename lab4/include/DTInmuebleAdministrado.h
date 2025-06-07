@@ -11,10 +11,11 @@ class DTInmuebleAdministrado {
 
     public:
         DTInmuebleAdministrado(int codigo, std::string direccion, DTFecha* fechaComienzo);
-        int getCodigo();
-        std::string getDireccion();
+        int getCodigo() const;
+        std::string getDireccion()const;
         DTFecha* getFechaComienzo();
         ~DTInmuebleAdministrado();
+        bool operator<(const DTInmuebleAdministrado& otro) const;
 };
 
 #endif
