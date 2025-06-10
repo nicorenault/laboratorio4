@@ -6,6 +6,8 @@
 #include "Apartamento.h"
 #include "DTCasa.h"
 #include "DTApartamento.h"
+#include "ControladorFechaActual.h"
+#include "Factory.h"
 
 
 int ControladorSistema::ultimaPublicacion = 0;
@@ -83,10 +85,10 @@ set<DTInmuebleListado> ControladorSistema::listarInmuebles(){
 void ControladorSistema::altaAdministraPropiedad(string nickname, int codigo) {
     Inmobiliaria* inmobiliaria = inmobiliarias[nickname];
     Inmueble* inmueble = inmuebles[codigo];
+    Factory* factory = Factory::getInstance();
+    IControladorFechaActual* cfecha = factory->getControladorFechaActual();
 
-    time_t now = time(0);
-    tm* ltm = localtime(&now);
-    DTFecha* fecha = new DTFecha(ltm->tm_mday, 1 + ltm->tm_mon, 1900 + ltm->tm_year);
+    DTFecha* fecha = cfecha->getFechaActual();
 
     AdministraPropiedad* ap = new AdministraPropiedad(fecha);
     ap->setInmueble(inmueble);
@@ -144,16 +146,15 @@ bool ControladorSistema::altaPublicacion(string nicknameInmobiliaria, int codigo
     Inmueble* in = inmuebles[codigoInmueble];
     AdministraPropiedad* ap = i->getAdministracionCon(in);
     
-    
-    time_t now = time(0);
-    tm* ltm = localtime(&now);
-    DTFecha* fecha = new DTFecha(ltm->tm_mday, 1 + ltm->tm_mon, 1900 + ltm->tm_year);
+    Factory* factory = Factory::getInstance();
+    IControladorFechaActual* cfecha = factory->getControladorFechaActual();
+
+    DTFecha* fecha = cfecha->getFechaActual();
     int codigo = ++ultimaPublicacion;
 
         Publicacion* nueva = new Publicacion(codigo, fecha, tipo, texto, precio, true);
         ap->agregarPublicacion(nueva);
 
-        // Desactivar anterior publicación del mismo tipo, si la hay
         Publicacion* vieja = ap->getPublicacionActivaDelTipo(tipo);
         if (vieja != nullptr)
             vieja->setActiva(false);
@@ -248,25 +249,16 @@ set<DTInmuebleListado> ControladorSistema::listarInmueblesNoAdministradosInmobil
 //FAlTA IMPLEMENTAR
 
 void ControladorSistema::finalizarAltaUsuario() {}
-
-
 set<DTPublicacion> ControladorSistema::listarPublicacion(TipoPublicacion tipo, float precioMin, float precioMax, TipoInmueble tipoInmueble) {
     return {};
 }
-
 DTInmueble* ControladorSistema::detalleInmueble(int codigoInmueble){
     return{};
 }
-
-
-//DTInmueble detalleInmueblePublicacion(codigoPublicacion): DTInmueble
 DTInmueble* ControladorSistema::detalleInmueblePublicacion(int codigoPublicacion){
     return nullptr;
 }
-
-
 void ControladorSistema::eliminarInmueble(int codigoInmueble) {}
-
 
 
 //funciones para notificaciones
