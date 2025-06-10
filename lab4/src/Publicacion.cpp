@@ -1,7 +1,9 @@
 #include "Publicacion.h"
 
 Publicacion::Publicacion(int codigo, DTFecha* fecha, TipoPublicacion tipo, std::string texto, float precio, bool activa)
-    : codigo(codigo), fecha(fecha), tipo(tipo), texto(texto), precio(precio), activa(activa) {}
+    : codigo(codigo), fecha(fecha), tipo(tipo), texto(texto), precio(precio), activa(activa) {
+        fecha = new DTFecha(fecha);
+    }
 
 int Publicacion::getCodigo() const {
     return codigo;
@@ -31,6 +33,15 @@ void Publicacion::setActiva(bool a) {
     activa = a;
 }
 
+void Publicacion::setAdministraPropiedad(AdministraPropiedad* ap) {
+    administra = ap;
+}
 
+AdministraPropiedad* Publicacion::getAdministraPropiedad() const {
+    return administra;
+}
 
-Publicacion::~Publicacion() {}
+Publicacion::~Publicacion() {
+    delete fecha;
+}
+

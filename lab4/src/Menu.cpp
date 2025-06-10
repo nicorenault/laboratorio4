@@ -326,7 +326,8 @@ void altaPublicacion(){
 void consultaPublicaciones(){
 
     Factory* factory = Factory::getInstance();
-
+    IControladorSistema* controlador = factory->getControladorSistema();
+    
     int inTipoPublicacion;
     std::cout << "Tipo de Publicacion: (1: Venta, 0: Alquiler)";
     std::cin >> inTipoPublicacion;
@@ -357,7 +358,18 @@ void consultaPublicaciones(){
     
     //TODO: Coleccion de DTPublicacion = Controlador->listarPublicacion(tipoPublicacion, precionMinimo, precioMaximo, tipoInmueble);
     //Recorrer la coleccion Mostrar "- Codigo: xx, fecha: dd/mm/yyyy, texto: zzz, precio: aaa, inmobiliaria: bbb";
-    
+    std::set<DTPublicacion> pubs = controlador->listarPublicacion(
+        tipoPublicacion, precioMinimo, precioMaximo, tipoInmueble
+    );
+    std::set<DTPublicacion>::iterator itPub;
+    for (itPub = pubs.begin(); itPub != pubs.end(); ++itPub) {
+        std::cout << "- Codigo: "      << itPub->getCodigo()
+                  << ", fecha: "       << itPub->getFecha()->toString()
+                  << ", texto: "       << itPub->getTexto()
+                  << ", precio: "      << itPub->getPrecio()
+                  << ", inmobiliaria: " << itPub->getInmobiliaria()
+                  << std::endl;
+    }
     
     int verDetalle;
     std::cout << "Ver detalle de la publicacion: (1: Si, 0: No)";

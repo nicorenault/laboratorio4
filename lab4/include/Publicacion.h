@@ -3,6 +3,7 @@
 #include "DTFecha.h"
 #include "TipoPublicacion.h"
 #include <string>
+class AdministraPropiedad;
 
 class Publicacion {
 private:
@@ -12,6 +13,7 @@ private:
     std::string texto;
     float precio;
     bool activa;
+    AdministraPropiedad* administra;
 
 public:
     Publicacion(int codigo, DTFecha* fecha, TipoPublicacion tipo, std::string texto, float precio, bool activa);
@@ -21,7 +23,8 @@ public:
     std::string getTexto() const;
     float getPrecio() const;
     bool getActiva() const;
-    
+    void setAdministraPropiedad(AdministraPropiedad* ap);
+    AdministraPropiedad* getAdministraPropiedad() const;
 
     void setActiva(bool a);
     ~Publicacion();

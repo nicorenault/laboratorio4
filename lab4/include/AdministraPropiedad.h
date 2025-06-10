@@ -5,7 +5,7 @@
 #include <set>
 class Inmueble;
 class Inmobiliaria;
-
+class Publicacion;
 
 class AdministraPropiedad {
     private:

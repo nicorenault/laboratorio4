@@ -8,6 +8,7 @@
 #include "DTApartamento.h"
 #include "ControladorFechaActual.h"
 #include "Factory.h"
+#include "DTPublicacion.h"
 
 
 int ControladorSistema::ultimaPublicacion = 0;
@@ -154,12 +155,20 @@ bool ControladorSistema::altaPublicacion(string nicknameInmobiliaria, int codigo
 
         Publicacion* nueva = new Publicacion(codigo, fecha, tipo, texto, precio, true);
         ap->agregarPublicacion(nueva);
-
-        Publicacion* vieja = ap->getPublicacionActivaDelTipo(tipo);
-        if (vieja != nullptr)
-            vieja->setActiva(false);
-
+        nueva->setAdministraPropiedad(ap);
+        publicaciones.insert(nueva);
+    Publicacion* anterior = ap->getPublicacionActivaDelTipo(tipo);
+        if (anterior != nullptr) {
+            if (anterior->getFecha()->operator< (fecha)) {
+                anterior->setActiva(false);
+                nueva->setActiva(true);
+            }
+        } else {
+            nueva->setActiva(true);
+        }
+    
         return true;
+
 
     
     /*
@@ -246,12 +255,52 @@ set<DTInmuebleListado> ControladorSistema::listarInmueblesNoAdministradosInmobil
 }
 
 
+
+set<DTPublicacion> ControladorSistema::listarPublicacion(TipoPublicacion tipo, float precioMin, float precioMax, TipoInmueble tipoInmueble) {
+    
+    std::set<DTPublicacion> resultado;
+    std::set<Publicacion*>::iterator itPub;
+
+    for (itPub = publicaciones.begin(); itPub != publicaciones.end(); ++itPub) {
+        Publicacion* p = *itPub;
+
+        if ( p->getActiva()
+          && p->getTipo() == tipo
+          && p->getPrecio() >= precioMin
+          && p->getPrecio() <= precioMax )
+        {
+            AdministraPropiedad* ap = p->getAdministraPropiedad();
+            Inmueble* in = ap->getInmueble();
+           /* bool pasaTipo =
+                tipoInmueble == Todos
+             || (tipoInmueble == Casa       && in->esCasa())
+             || (tipoInmueble == Apartamento && !in->esCasa());*/
+            //if (pasaTipo) {
+
+                std::string nomInmo = ap->getInmobiliaria()->getNombre();
+                std::string precioStr = std::to_string(p->getPrecio());
+
+                DTPublicacion dto = DTPublicacion(
+                    p->getCodigo(),
+                    p->getFecha(),
+                    p->getTexto(),
+                    precioStr,
+                    nomInmo);
+
+                resultado.insert(dto);
+            //}
+            }
+        }
+    return resultado;
+}
+  
+ 
+
 //FAlTA IMPLEMENTAR
 
 void ControladorSistema::finalizarAltaUsuario() {}
-set<DTPublicacion> ControladorSistema::listarPublicacion(TipoPublicacion tipo, float precioMin, float precioMax, TipoInmueble tipoInmueble) {
-    return {};
-}
+   
+ 
 DTInmueble* ControladorSistema::detalleInmueble(int codigoInmueble){
     return{};
 }
